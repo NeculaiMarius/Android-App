@@ -1,10 +1,8 @@
 package com.example.recipes_app;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StringDef;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -62,48 +58,45 @@ public class RecipeAdapter extends ArrayAdapter<Recipe> {
         });
 
         //IMAGINE
-        new DownloadImageTask(imiImagine).execute(reteta.getImageUrl());
+        Runnable downloadImageRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // Descarcă imaginea pe thread-ul secundar
+                Bitmap bitmap = downloadImage(reteta.getImageUrl());
+
+                MainActivity context1 = (MainActivity) context;
+                context1.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imiImagine.setImageBitmap(bitmap);
+                    }
+                });            }
+        };
+
+        Thread downloadThread = new Thread(downloadImageRunnable);
+        downloadThread.start();
 
 
         return convertView;
     }
 
-    private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        private ImageView imageView;
+    private Bitmap downloadImage(String imageUrl) {
+        Bitmap bitmap = null;
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
 
-        public DownloadImageTask(ImageView imageView) {
-            this.imageView = imageView;
+            InputStream input = connection.getInputStream();
+
+            bitmap = BitmapFactory.decodeStream(input);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        @Override
-        protected Bitmap doInBackground(String... urls) {
-            String imageUrl = urls[0];
-            Bitmap bitmap = null;
-            try {
-                // Crează conexiunea HTTP
-                URL url = new URL(imageUrl);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-
-                // Citește InputStream-ul din conexiune
-                InputStream input = connection.getInputStream();
-
-                // Convertește InputStream-ul într-un Bitmap
-                bitmap = BitmapFactory.decodeStream(input);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return bitmap;
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap result) {
-            // Setează imaginea descărcată în ImageView
-            if (result != null) {
-                imageView.setImageBitmap(result);
-            }
-        }
+        return bitmap;
     }
+
+
 
 }
