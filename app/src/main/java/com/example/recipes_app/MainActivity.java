@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResult;
@@ -50,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
         listaRetete.add(r2);
         listaRetete.add(r3);
 
-        Log.e("MainActivity",listaRetete.toString());
 
         lvRecipes=findViewById(R.id.lvRecipes);
         adapter=new RecipeAdapter(this,R.layout.lv_item_recipe,listaRetete);
@@ -79,7 +79,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     Log.e("MainActivity","REZULTAT: "+o.toString());
-                    if (!listaRetete.contains(o)){
+                    if (! listaRetete.contains(o)){
+                        listaRetete.add(o);
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(), "Recipe updated!", Toast.LENGTH_LONG).show();
+                        int index = listaRetete.indexOf(o);
+                        listaRetete.remove(index);
                         listaRetete.add(o);
                     }
                     adapter.notifyDataSetChanged();
@@ -115,5 +122,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onEditClick(int position){
+        Intent intent=new Intent(getApplicationContext(), RecipeActivity.class);
+        Recipe r=listaRetete.get(position);
+        intent.putExtra("recipeKey",r);
+        activityLauncher.launch(intent);
+    }
 
 }

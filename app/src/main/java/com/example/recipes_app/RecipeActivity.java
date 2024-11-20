@@ -22,6 +22,8 @@ public class RecipeActivity extends AppCompatActivity {
     private EditText etDescriere;
     private Switch swVegetariana;
     private RadioGroup rgTip;
+
+    private EditText etUrl;
     private Button btnAdauga;
     private Recipe reteta=null;
 
@@ -36,8 +38,8 @@ public class RecipeActivity extends AppCompatActivity {
             return insets;
         });
 
-//        Intent intent=getIntent();
-//        reteta=intent.getParcelableExtra("movieKey");
+        Intent intent=getIntent();
+        reteta=intent.getParcelableExtra("recipeKey");
 
 
 
@@ -51,6 +53,13 @@ public class RecipeActivity extends AppCompatActivity {
             reteta.setVegetarian(false);
             reteta.setTipReteta(TipReteta.Gustare);
             reteta.setVegetarian(swVegetariana.isChecked());
+        }
+        else {
+            etNume.setText(reteta.getNume());
+            etDescriere.setText(reteta.getDescriere());
+            swVegetariana.setChecked(reteta.isVegetarian());
+            etUrl.setText(reteta.getImageUrl());
+
         }
     }
 
@@ -80,7 +89,7 @@ public class RecipeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 reteta.setNume(etNume.getText().toString());
                 reteta.setDescriere(etDescriere.getText().toString());
-
+                reteta.setImageUrl(etUrl.getText().toString());
 
                 Log.w("RecipeActivity",reteta.toString());
 
@@ -97,6 +106,7 @@ public class RecipeActivity extends AppCompatActivity {
         etDescriere=findViewById(R.id.etDescriere);
         swVegetariana=findViewById(R.id.swVegetariana);
         rgTip=findViewById(R.id.rgTip);
+        etUrl=findViewById(R.id.etUrl);
         btnAdauga=findViewById(R.id.btnAdauga);
     }
 }

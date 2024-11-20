@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,7 +52,8 @@ public class RecipeAdapter extends ArrayAdapter<Recipe> {
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Editeaza o reteta", Toast.LENGTH_LONG).show();
+                MainActivity mainActivity=(MainActivity) context;
+                mainActivity.onEditClick(position);
             }
         });
 
